@@ -3,14 +3,23 @@ import { ButtonModule } from 'primeng/button';
 import { TableModule } from 'primeng/table';
 import { CoreServiceService } from './core-service.service';
 import { CoreInterface, Result } from './core-interface';
+import { FormControl, ReactiveFormsModule, Validators } from '@angular/forms';
+import { Subscription } from 'rxjs';
+import { ChartModule } from 'primeng/chart';
 
 @Component({
     selector: 'button-demo',
     templateUrl: 'button-demo.html',
     standalone: true,
-    imports: [ButtonModule, TableModule]
+    imports: [ButtonModule, TableModule, ReactiveFormsModule, ChartModule]
 })
 export class ButtonDemo {
+
+    numericControl = new FormControl('', [
+        Validators.required,
+        Validators.pattern('^[0-9]*$')
+    ]);
+
     data: CoreInterface = {
         totalHits: 0,
         limit: 0,
@@ -19,10 +28,37 @@ export class ButtonDemo {
         searchId: ''
     };
 
-    @Input() query = '';
+    fieldData = {
+        labels: ["A", "B", "C"],
+        datasets: [
+            {
+                data: [150, 50, 100],
+                backgroundColor: ["#FF6384", "#36A2EB", "#FFCE56"]
+            }
+        ]
+    };
+
+    @Input() query = ''; // is this how to use @Input?
     @Input() limit = ''; // number checks on this
 
     constructor(private coreService: CoreServiceService) {}
+
+    private subscription: Subscription | null = null;
+
+    ngOnInit() {
+        this.subscription = this.numericControl.valueChanges.subscribe(value => {
+            const sanitized = (value ?? '').replace(/\D/g, ''); // remove all non-digits
+            if (sanitized !== value) {
+                this.numericControl.setValue(sanitized, { emitEvent: false });
+            }
+        });
+    }
+    
+    ngOnDestroy() {
+        if (this.subscription) {
+            this.subscription.unsubscribe();
+        }
+    }
 
     fetch() {
         this.coreService.getCoreData(this.query, this.limit).subscribe({

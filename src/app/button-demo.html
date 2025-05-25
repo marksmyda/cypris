@@ -1,8 +1,8 @@
 <div>Query</div>
-<input type="text" [contentEditable]="true" (input)="onQueryChange($event)" placeholder="Enter search query">
+<input type="text" (input)="onQueryChange($event)" placeholder="Enter search query" size="200">
 
 <div>Limit</div>
-<input type="text" [contentEditable]="true" (input)="onLimitChange($event)" placeholder="Limit results">
+<input type="text" (input)="onLimitChange($event)" placeholder="Limit results" size="10" [formControl]="numericControl">
 
 <div class="card flex justify-center">
     <p-button (click)="fetch()" label="Check" />
@@ -45,3 +45,7 @@
         </tr>
     </ng-template>
 </p-table>
+
+<div class="chart-container" style="max-width: 500px;">
+    <p-chart type="doughnut" [data]="fieldData" class="w-full md:w-[30rem]" />
+</div>

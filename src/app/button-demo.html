@@ -1,3 +1,9 @@
+<div>Query</div>
+<input type="text" [contentEditable]="true" (input)="onQueryChange($event)" placeholder="Enter search query">
+
+<div>Limit</div>
+<input type="text" [contentEditable]="true" (input)="onLimitChange($event)" placeholder="Limit results">
+
 <div class="card flex justify-center">
     <p-button (click)="fetch()" label="Check" />
 </div>

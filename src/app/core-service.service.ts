@@ -13,12 +13,12 @@ export class CoreServiceService {
 
   constructor(private http: HttpClient) { }
 
-  getQueryUrl(query: string): string {
-    return `https://api.core.ac.uk/v3/search/works?q=${query}`;
+  getQueryUrl(query: string, limit: string): string {
+    return `https://api.core.ac.uk/v3/search/works?q=${query}&limit=${limit}`;
   }
 
-  getCoreData(query: string): Observable<CoreInterface> {
-    return this.http.get<CoreInterface>(`${this.getQueryUrl(query)}`);
+  getCoreData(query: string, limit: string): Observable<CoreInterface> {
+    return this.http.get<CoreInterface>(`${this.getQueryUrl(query, limit)}`);
   }
 
 }

@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, Input } from '@angular/core';
 import { ButtonModule } from 'primeng/button';
 import { TableModule } from 'primeng/table';
 import { CoreServiceService } from './core-service.service';
@@ -19,10 +19,13 @@ export class ButtonDemo {
         searchId: ''
     };
 
+    @Input() query = '';
+    @Input() limit = ''; // number checks on this
+
     constructor(private coreService: CoreServiceService) {}
 
     fetch() {
-        this.coreService.getCoreData('(drone)').subscribe({
+        this.coreService.getCoreData(this.query, this.limit).subscribe({
             next: (data) => {
                 this.data = data;
                 console.log(this.data);
@@ -36,6 +39,16 @@ export class ButtonDemo {
 
     getAuthorNames(result: Result): string {
         return result.authors.map(author => author.name).join(', ');
+    }
+
+    onQueryChange(event: Event) {
+        const target = event.target as HTMLInputElement;
+        this.query = target.value;
+    }
+
+    onLimitChange(event: Event) {
+        const target = event.target as HTMLInputElement;
+        this.limit = target.value;
     }
 
 }

@@ -7,22 +7,18 @@
 <div class="card flex justify-center">
     <p-button (click)="fetch()" label="Check" />
 </div>
-
+<p-progressspinner aria-label="Loading"></p-progressspinner>
 <p-table [value]="[data]">
     <ng-template pTemplate="header">
         <tr>
           <th>Total Hits</th>
           <th>Limit</th>
-          <th>Offset</th>
-          <th>Search ID</th>
         </tr>
     </ng-template>
     <ng-template pTemplate="body" let-data>
         <tr>
           <td>{{ data.totalHits }}</td>
           <td>{{ data.limit }}</td>
-          <td>{{ data.offset }}</td>
-          <td>{{ data.searchId }}</td>
         </tr>
     </ng-template>
 </p-table>
@@ -30,18 +26,16 @@
 <p-table [value]="data.results">
     <ng-template pTemplate="header">
         <tr>
-            <th>DOI</th>
+            <th>Title</th>
             <th>Published Date</th>
             <th>Authors</th>
-            <th>Title</th>
         </tr>
     </ng-template>
     <ng-template pTemplate="body" let-result>
         <tr>
-            <td>{{ result.doi }}</td>
-            <td>{{ result.publishedDate }}</td>
-            <td>{{ getAuthorNames(result) }}</td>
             <td>{{ result.title }}</td>
+            <td>{{ getDateFromString(result) | date:'yyyy MMM dd' }}</td>
+            <td>{{ getAuthorNames(result) }}</td>
         </tr>
     </ng-template>
 </p-table>

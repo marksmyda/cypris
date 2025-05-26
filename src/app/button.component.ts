@@ -6,12 +6,14 @@ import { CoreInterface, Result } from './core-interface';
 import { FormControl, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Subscription } from 'rxjs';
 import { ChartModule } from 'primeng/chart';
+import { ProgressSpinnerModule } from 'primeng/progressspinner';
+import { DatePipe } from '@angular/common';
 
 @Component({
     selector: 'button-demo',
     templateUrl: 'button-demo.html',
     standalone: true,
-    imports: [ButtonModule, TableModule, ReactiveFormsModule, ChartModule]
+    imports: [ButtonModule, TableModule, ReactiveFormsModule, ChartModule, ProgressSpinnerModule, DatePipe]
 })
 export class ButtonDemo {
 
@@ -75,6 +77,10 @@ export class ButtonDemo {
 
     getAuthorNames(result: Result): string {
         return result.authors.map(author => author.name).join(', ');
+    }
+
+    getDateFromString(result: Result): Date {
+        return new Date(result.publishedDate);
     }
 
     onQueryChange(event: Event) {

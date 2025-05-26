@@ -48,6 +48,8 @@ export class ButtonDemo {
     errorMsg: string | null = null;
 
     constructor(private coreService: CoreServiceService) {}
+
+    expandedRows: Record<string, boolean> = {};
     
     ngOnDestroy() {
         clearTimeout(this.timerId)
@@ -57,7 +59,7 @@ export class ButtonDemo {
         clearTimeout(this.timerId);
         this.timerId = window.setTimeout(() => {
             this.dt.filterGlobal(term, 'contains');
-        }, 350);
+        }, 450);
     }
 
     getAuthorNames(result: Result): string {

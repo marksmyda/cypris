@@ -1,6 +1,6 @@
 <p-table 
-    #dt
-    [value]="data.results"
+    #dt dataKey="id"
+    [value]="data.results" [expandedRowKeys]="expandedRows"
     stripedRows [paginator]=true
     scrollable=true [showCurrentPageReport]="true"
     [rows]="5" [rowsPerPageOptions]="[5, 10, 25, 50]"
@@ -38,18 +38,20 @@
         </tr>
     </ng-template>
     <ng-template #expandedrow let-result>
-        <p-table [value]="result" dataKey="id">
-            <tr>
-                <th>ID</th>
-                <th>Abstract</th>
-                <th>Full Text</th>
-            </tr>
-            <tr>
-                <td>{{ result.id }} </td>
-                <td>{{ result.abstract }}</td>
-                <td>{{ result.fullText }}</td>
-            </tr>
-        </p-table>
+        <tr>
+            <td [attr.colspan]="6">
+                <div>
+                    <h4>Abstract</h4>
+                    <ng-container *ngIf="result.abstract; else noAbstract">
+                        <p>{{ result.abstract }}</p>
+                    </ng-container>
+
+                    <ng-template #noAbstract>
+                        <p>Not Available</p>
+                    </ng-template>
+                </div>
+            </td>
+        </tr>
     </ng-template>
     <ng-template pTemplate="emptymessage">
         <tr>

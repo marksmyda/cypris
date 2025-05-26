@@ -3,6 +3,18 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { CoreInterface } from './core-interface';
 
+const BASE_URL: string = 'https://api.core.ac.uk/v3/search/works/'
+
+interface Sort {
+  field: string;
+  order: number;
+}
+
+interface Pagination {
+  limit: number;
+  offset: number;
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -13,10 +25,14 @@ export class CoreServiceService {
 
   constructor(private http: HttpClient) { }
 
-  buildQueryforGet(search: string, limit: string): string {
-    const uri = `https://api.core.ac.uk/v3/search/works?q=(${this.getQualifiedSearchString(search)})&limit=${limit}`;
-    console.log(new Date(Date.now()).toTimeString() + " | GET request to: " + uri);
-
+  buildQueryforGet(search: string, pagination: Pagination, sort?: Sort): string {
+    let uri: string = `${BASE_URL}?limit=${pagination.limit}&offset=${pagination.offset}`;
+    if (search) {
+     uri = `${uri}&q=(${this.getQualifiedSearchString(search)})`
+    }
+    if (sort) {
+      uri = `${uri}&sort=${sort.field}:${sort.order === 1 ? 'asc' : 'desc'}` 
+    }
     return uri;
   }
 
@@ -34,9 +50,9 @@ export class CoreServiceService {
     }).join('');
   }
 
-  getCoreData(query: string, limit: string): Observable<CoreInterface> {
+  getCoreData(query: string, pagination: Pagination, sort?: Sort): Observable<CoreInterface> {
     return this.http.get<CoreInterface>(`
-      ${this.buildQueryforGet(query, limit)}
+      ${this.buildQueryforGet(query, pagination, sort)}
     `);
   }
 

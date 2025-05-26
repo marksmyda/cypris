@@ -1,37 +1,36 @@
-import { Component, Input } from '@angular/core';
+import { Component, ViewChild } from '@angular/core';
 import { ButtonModule } from 'primeng/button';
-import { TableModule } from 'primeng/table';
+import { IconFieldModule } from 'primeng/iconfield';
+import { InputIconModule } from 'primeng/inputicon';
+import { MessageModule } from 'primeng/message';
+import { TableLazyLoadEvent, TableModule } from 'primeng/table';
 import { CoreServiceService } from './core-service.service';
 import { CoreInterface, Result } from './core-interface';
-import { FormControl, ReactiveFormsModule, Validators } from '@angular/forms';
-import { Subscription } from 'rxjs';
+import { ReactiveFormsModule } from '@angular/forms';
 import { ChartModule } from 'primeng/chart';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
-import { formatDate } from '@angular/common';
-import { SortEvent } from 'primeng/api';
+import { formatDate, NgIf } from '@angular/common';
+import { Table } from 'primeng/table';
+import { HttpErrorResponse } from '@angular/common/http';
 
-import moment from 'moment';
+const NO_DATA = {
+    totalHits: 0,
+    limit: 0,
+    offset: 0,
+    results: [],
+    searchId: ''
+};
 
 @Component({
     selector: 'button-demo',
     templateUrl: 'button-demo.html',
     standalone: true,
-    imports: [ButtonModule, TableModule, ReactiveFormsModule, ChartModule, ProgressSpinnerModule]
+    imports: [ButtonModule, TableModule, ReactiveFormsModule, ChartModule, ProgressSpinnerModule, IconFieldModule, InputIconModule, NgIf, MessageModule]
 })
 export class ButtonDemo {
+    @ViewChild('dt') dt!: Table;
 
-    numericControl = new FormControl('', [
-        Validators.required,
-        Validators.pattern('^[0-9]*$')
-    ]);
-
-    data: CoreInterface = {
-        totalHits: 0,
-        limit: 0,
-        offset: 0,
-        results: [],
-        searchId: ''
-    };
+    data: CoreInterface = NO_DATA;
 
     fieldData = {
         labels: ["A", "B", "C"],
@@ -43,38 +42,22 @@ export class ButtonDemo {
         ]
     };
 
-    @Input() query = ''; // is this how to use @Input?
-    @Input() limit = ''; // number checks on this
+    private timerId: number | undefined;
+    
+    loading: boolean = false;
+    errorMsg: string | null = null;
 
     constructor(private coreService: CoreServiceService) {}
-
-    private subscription: Subscription | null = null;
-
-    ngOnInit() {
-        this.subscription = this.numericControl.valueChanges.subscribe(value => {
-            const sanitized = (value ?? '').replace(/\D/g, ''); // remove all non-digits
-            if (sanitized !== value) {
-                this.numericControl.setValue(sanitized, { emitEvent: false });
-            }
-        });
-    }
     
     ngOnDestroy() {
-        if (this.subscription) {
-            this.subscription.unsubscribe();
-        }
+        clearTimeout(this.timerId)
     }
 
-    fetch() {
-        this.coreService.getCoreData(this.query, this.limit).subscribe({
-            next: (data) => {
-                this.data = data;
-            },
-            error: (error) => {
-                console.log('Problem contacting service: ', error);
-                throw new Error('Failed to fetch Core data.');
-            }
-        });
+    onSearch(term: string): void {
+        clearTimeout(this.timerId);
+        this.timerId = window.setTimeout(() => {
+            this.dt.filterGlobal(term, 'contains');
+        }, 350);
     }
 
     getAuthorNames(result: Result): string {
@@ -85,14 +68,51 @@ export class ButtonDemo {
         return formatDate(new Date(result.publishedDate), 'yyyy MMM dd', 'en');
     }
 
-    onQueryChange(event: Event) {
-        const target = event.target as HTMLInputElement;
-        this.query = target.value;
+    private handleError(err: HttpErrorResponse) {
+        console.log(err);
+        if (err.status === 429) {
+            this.errorMsg = 'Too many requests - please pause a moment and try again.';
+        } else if (err.status === 500) {
+            this.errorMsg = 'Sorry, the server ran into a problem. Please try again later.';
+        } else {
+            this.errorMsg = 'Unexpected error (' + err.status + ').';
+        }
     }
 
-    onLimitChange(event: Event) {
-        const target = event.target as HTMLInputElement;
-        this.limit = target.value;
+    loadPage($event: TableLazyLoadEvent) {
+        this.loading = true;
+        this.errorMsg = null;
+
+        const pagination = {
+            limit: $event.rows ?? 10,
+            offset: $event.first ?? 0
+        }
+
+        if (Array.isArray($event.sortField)) {
+            throw new Error('Multidimensional sort is not supported');
+        }
+
+        const sort = ($event.sortField) ? {
+            field: $event.sortField,
+            order: $event.sortOrder ?? 1
+        } : undefined;
+
+        const term = $event.globalFilter ?? ''
+        if (Array.isArray(term)) {
+            throw new Error('Multidimensional search is not supported');
+        }
+
+        this.coreService.getCoreData(term, pagination, sort).subscribe({
+            next: (data) => {
+                this.loading = false;
+                this.data = data;
+            },
+            error: (error) => {
+                this.loading = false;
+                this.data = NO_DATA;
+                this.handleError(error);
+            },
+        });
     }
 
     // TODO make sure search is empty or better here
@@ -118,38 +138,4 @@ export class ButtonDemo {
 
         return stack.length === 0;
     }
-
-      customSort(event: SortEvent) {
-        if (event.data) {
-            if (event.field === 'getDateFromString') {
-                event.data.sort((a, b) => {
-                    const dateA = moment(this.getDateFromString(a), 'yyyy MMM dd');
-                    const dateB = moment(this.getDateFromString(b), 'yyyy MMM dd');
-
-                    if (dateA.isBefore(dateB)) {
-                        return event.order === 1 ? -1 : 1;
-                    } else if (dateA.isAfter(dateB)) {
-                        return event.order === 1 ? 1 : -1;
-                    } else {
-                        return 0;
-                    }
-                });
-            } else {
-                event.data.sort((a, b) => {
-                    let field = event.field ?? '';
-                    const valueA = a[field];
-                    const valueB = b[field];
-
-                    if (valueA < valueB) {
-                        return event.order === 1 ? -1 : 1;
-                    } else if (valueA > valueB) {
-                        return event.order === 1 ? 1 : -1;
-                    } else {
-                        return 0;
-                    }
-                });
-            }
-        }
-    }
-
 }

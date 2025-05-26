@@ -1,45 +1,67 @@
-<div>Query</div>
-<input type="text" (input)="onQueryChange($event)" placeholder="Enter search query" size="200">
+<p-table 
+    #dt
+    [value]="data.results"
+    stripedRows [paginator]=true
+    scrollable=true [showCurrentPageReport]="true"
+    [rows]="5" [rowsPerPageOptions]="[5, 10, 25, 50]"
+    [lazy]="true" (onLazyLoad)="loadPage($event)" [loading]="loading"
+    [totalRecords]="data.totalHits">
 
-<div>Limit</div>
-<input type="text" (input)="onLimitChange($event)" placeholder="Limit results" size="10" [formControl]="numericControl">
+    <ng-template #caption>
+        <label>Query</label>
+        <p-iconfield>
+            <p-inputicon styleClass="pi pi-search" />
+            <input #search pInputText type="text" (input)="onSearch(search.value)" placeholder="Search..." />
+        </p-iconfield>
+    </ng-template>
 
-<div class="card flex justify-center">
-    <p-button (click)="fetch()" label="Check" />
-</div>
-<!-- <p-progressspinner aria-label="Loading"></p-progressspinner> -->
-<p-table [value]="[data]">
     <ng-template pTemplate="header">
         <tr>
-          <th>Total Hits</th>
-          <th>Limit</th>
-        </tr>
-    </ng-template>
-    <ng-template pTemplate="body" let-data>
-        <tr>
-          <td>{{ data.totalHits }}</td>
-          <td>{{ data.limit }}</td>
-        </tr>
-    </ng-template>
-</p-table>
-
-<p-table [value]="data.results" stripedRows [paginator]="true" [rows]="10" [rowsPerPageOptions]="[5, 10, 20]" [customSort]="true" (sortFunction)="customSort($event)">
-    <ng-template pTemplate="header">
-        <tr>
-            <th pSortableColumn="title">Title <p-sortIcon field="title" /></th>
-            <th pSortableColumn="getDateFromString">Published Date <p-sortIcon field="getDateFromString" /></th>
+            <th style="width: 5rem"></th>
+            <th>Title</th>
+            <th pSortableColumn="publishedDate">Published Date <p-sortIcon field="publishedDate" /></th>
             <th>Authors</th>
-            <th pSortableColumn="publisher">Publisher <p-sortIcon field="publisher" /></th>
+            <th>Publisher</th>
             <th pSortableColumn="citationCount">Citations <p-sortIcon field="citationCount" /></th>
         </tr>
     </ng-template>
-    <ng-template pTemplate="body" let-result>
+    <ng-template pTemplate="body" let-result let-expanded="expanded">
         <tr>
+            <td>
+                <p-button type="button" pRipple [pRowToggler]="result" [text]="true" [rounded]="true" [plain]="true" [icon]="expanded ? 'pi pi-chevron-down' : 'pi pi-chevron-right'" />
+            </td>
             <td>{{ result.title }}</td>
             <td>{{ getDateFromString(result) }}</td>
             <td>{{ getAuthorNames(result) }}</td>
             <td>{{ result.publisher }}</td>
             <td>{{ result.citationCount }}</td>
+        </tr>
+    </ng-template>
+    <ng-template #expandedrow let-result>
+        <p-table [value]="result" dataKey="id">
+            <tr>
+                <th>ID</th>
+                <th>Abstract</th>
+                <th>Full Text</th>
+            </tr>
+            <tr>
+                <td>{{ result.id }} </td>
+                <td>{{ result.abstract }}</td>
+                <td>{{ result.fullText }}</td>
+            </tr>
+        </p-table>
+    </ng-template>
+    <ng-template pTemplate="emptymessage">
+        <tr>
+            <td [attr.colspan]="6" class="text-center">
+                <ng-container *ngIf="errorMsg; else noRows">
+                    <p-message severity="error" [text]="errorMsg"></p-message>
+                </ng-container>
+
+                <ng-template #noRows>
+                    <span>No records found.</span>
+                </ng-template>
+            </td>
         </tr>
     </ng-template>
 </p-table>

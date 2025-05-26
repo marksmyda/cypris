@@ -13,8 +13,25 @@ export class CoreServiceService {
 
   constructor(private http: HttpClient) { }
 
-  buildQueryforGet(query: string, limit: string): string {
-    return `https://api.core.ac.uk/v3/search/works?q=(${query})&limit=${limit}`;
+  buildQueryforGet(search: string, limit: string): string {
+    const uri = `https://api.core.ac.uk/v3/search/works?q=(${this.getQualifiedSearchString(search)})&limit=${limit}`;
+    console.log(new Date(Date.now()).toTimeString() + " | GET request to: " + uri);
+
+    return uri;
+  }
+
+  getQualifiedSearchString(search: string): string {
+    const tokens = search.split(new RegExp(`(AND)|(OR)|(\\()|(\\))|(\\s+)`)).filter(item => item !== undefined && item !== '');
+
+    return tokens.map(token => {
+      if (['AND', 'OR', '(', ')'].includes(token)) {
+        return token;
+      } else if (token.trim() === '') {
+        return ' ';
+      } else {
+        return `fullText:"${token}"`;
+      }
+    }).join('');
   }
 
   getCoreData(query: string, limit: string): Observable<CoreInterface> {

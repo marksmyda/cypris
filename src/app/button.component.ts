@@ -87,4 +87,28 @@ export class ButtonDemo {
         this.limit = target.value;
     }
 
+    // TODO make sure search is empty or better here
+    isGroupingValid(search: string): boolean {
+        const groupings = search.replace(/[^()]/g, '');
+        if (groupings === '') {
+            return true;
+        }
+
+        const stack = [];
+        for (const char of groupings) {
+            if (char === '(') {
+                stack.push(char);
+                continue;
+            }
+
+            if (stack.length === 0) {
+                return false;
+            }
+
+            stack.pop();
+        }
+
+        return stack.length === 0;
+    }
+
 }

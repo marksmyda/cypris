@@ -21,11 +21,11 @@ export class CoreServiceService {
   }
 
   getQualifiedSearchString(search: string): string {
-    const tokens = search.split(new RegExp(`(AND)|(OR)|(\\()|(\\))|(\\s+)`)).filter(item => item !== undefined && item !== '');
+    const tokens = search.split(new RegExp(`(AND)|(OR)|(\\()|(\\))|(\\s+)`, 'i')).filter(item => item !== undefined && item !== '');
 
     return tokens.map(token => {
-      if (['AND', 'OR', '(', ')'].includes(token)) {
-        return token;
+      if (['AND', 'OR', '(', ')'].includes(token.toUpperCase())) {
+        return token.toUpperCase();
       } else if (token.trim() === '') {
         return ' ';
       } else {

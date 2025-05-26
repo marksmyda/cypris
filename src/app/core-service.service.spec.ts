@@ -22,4 +22,9 @@ describe('CoreServiceService', () => {
     .toBe('fullText:"drone" AND ( fullText:"package" OR fullText:"delivery") ');
   });
 
+  it('should qualify [drone and (package or delivery)] as [fullText:"drone" AND (fullText:"package" OR fullText:"delivery")]', () => {
+    expect(service.getQualifiedSearchString('drone and (package or delivery)'))
+    .toBe('fullText:"drone" AND (fullText:"package" OR fullText:"delivery")');
+  });
+
 });

@@ -7,13 +7,16 @@ import { FormControl, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Subscription } from 'rxjs';
 import { ChartModule } from 'primeng/chart';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
-import { DatePipe } from '@angular/common';
+import { formatDate } from '@angular/common';
+import { SortEvent } from 'primeng/api';
+
+import moment from 'moment';
 
 @Component({
     selector: 'button-demo',
     templateUrl: 'button-demo.html',
     standalone: true,
-    imports: [ButtonModule, TableModule, ReactiveFormsModule, ChartModule, ProgressSpinnerModule, DatePipe]
+    imports: [ButtonModule, TableModule, ReactiveFormsModule, ChartModule, ProgressSpinnerModule]
 })
 export class ButtonDemo {
 
@@ -66,7 +69,6 @@ export class ButtonDemo {
         this.coreService.getCoreData(this.query, this.limit).subscribe({
             next: (data) => {
                 this.data = data;
-                console.log(this.data);
             },
             error: (error) => {
                 console.log('Problem contacting service: ', error);
@@ -79,8 +81,8 @@ export class ButtonDemo {
         return result.authors.map(author => author.name).join(', ');
     }
 
-    getDateFromString(result: Result): Date {
-        return new Date(result.publishedDate);
+    getDateFromString(result: Result): string {
+        return formatDate(new Date(result.publishedDate), 'yyyy MMM dd', 'en');
     }
 
     onQueryChange(event: Event) {
@@ -115,6 +117,39 @@ export class ButtonDemo {
         }
 
         return stack.length === 0;
+    }
+
+      customSort(event: SortEvent) {
+        if (event.data) {
+            if (event.field === 'getDateFromString') {
+                event.data.sort((a, b) => {
+                    const dateA = moment(this.getDateFromString(a), 'yyyy MMM dd');
+                    const dateB = moment(this.getDateFromString(b), 'yyyy MMM dd');
+
+                    if (dateA.isBefore(dateB)) {
+                        return event.order === 1 ? -1 : 1;
+                    } else if (dateA.isAfter(dateB)) {
+                        return event.order === 1 ? 1 : -1;
+                    } else {
+                        return 0;
+                    }
+                });
+            } else {
+                event.data.sort((a, b) => {
+                    let field = event.field ?? '';
+                    const valueA = a[field];
+                    const valueB = b[field];
+
+                    if (valueA < valueB) {
+                        return event.order === 1 ? -1 : 1;
+                    } else if (valueA > valueB) {
+                        return event.order === 1 ? 1 : -1;
+                    } else {
+                        return 0;
+                    }
+                });
+            }
+        }
     }
 
 }

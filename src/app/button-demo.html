@@ -7,7 +7,7 @@
 <div class="card flex justify-center">
     <p-button (click)="fetch()" label="Check" />
 </div>
-<p-progressspinner aria-label="Loading"></p-progressspinner>
+<!-- <p-progressspinner aria-label="Loading"></p-progressspinner> -->
 <p-table [value]="[data]">
     <ng-template pTemplate="header">
         <tr>
@@ -23,19 +23,23 @@
     </ng-template>
 </p-table>
 
-<p-table [value]="data.results">
+<p-table [value]="data.results" stripedRows [paginator]="true" [rows]="10" [rowsPerPageOptions]="[5, 10, 20]" [customSort]="true" (sortFunction)="customSort($event)">
     <ng-template pTemplate="header">
         <tr>
-            <th>Title</th>
-            <th>Published Date</th>
+            <th pSortableColumn="title">Title <p-sortIcon field="title" /></th>
+            <th pSortableColumn="getDateFromString">Published Date <p-sortIcon field="getDateFromString" /></th>
             <th>Authors</th>
+            <th pSortableColumn="publisher">Publisher <p-sortIcon field="publisher" /></th>
+            <th pSortableColumn="citationCount">Citations <p-sortIcon field="citationCount" /></th>
         </tr>
     </ng-template>
     <ng-template pTemplate="body" let-result>
         <tr>
             <td>{{ result.title }}</td>
-            <td>{{ getDateFromString(result) | date:'yyyy MMM dd' }}</td>
+            <td>{{ getDateFromString(result) }}</td>
             <td>{{ getAuthorNames(result) }}</td>
+            <td>{{ result.publisher }}</td>
+            <td>{{ result.citationCount }}</td>
         </tr>
     </ng-template>
 </p-table>

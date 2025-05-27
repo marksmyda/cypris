@@ -1,6 +1,6 @@
 import { Routes } from '@angular/router';
-import { ButtonDemo } from './button.component';
+import { Cypris } from './cypris.component';
 
 export const routes: Routes = [
-    { path: 'button', component: ButtonDemo }
+    { path: '', component: Cypris }
 ];

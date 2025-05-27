@@ -1,19 +1,19 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { ButtonDemo } from './button.component';
+import { Cypris } from './cypris.component';
 import { provideHttpClient } from '@angular/common/http';
 
-describe('ButtonDemo', () => {
-  let component: ButtonDemo;
-  let fixture: ComponentFixture<ButtonDemo>;
+describe('Cypris', () => {
+  let component: Cypris;
+  let fixture: ComponentFixture<Cypris>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [ButtonDemo],
+      imports: [Cypris],
       providers: [provideHttpClient()]
     })
     .compileComponents();
 
-    fixture = TestBed.createComponent(ButtonDemo);
+    fixture = TestBed.createComponent(Cypris);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

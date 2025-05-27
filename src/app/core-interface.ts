@@ -64,3 +64,10 @@ export interface Link {
   type: string
   url: string
 }
+
+type FieldValue = string;
+type Frequency = number;
+export type Aggregation = Record<
+    'aggregations', 
+    Record<'yearPublished', Record<FieldValue, Frequency>>
+>;

@@ -1,7 +1,7 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { CoreInterface } from './core-interface';
+import { Aggregation, CoreInterface } from './core-interface';
 
 const BASE_URL: string = 'https://api.core.ac.uk/v3/search/works/'
 
@@ -53,7 +53,15 @@ export class CoreServiceService {
   getCoreData(query: string, pagination: Pagination, sort?: Sort): Observable<CoreInterface> {
     return this.http.get<CoreInterface>(`
       ${this.buildQueryforGet(query, pagination, sort)}
-    `);
+    `, { headers: this.headers });
+  }
+
+  postForAggregation(search: string, aggregations: string[]) {
+    return this.http.post<Aggregation>(`${BASE_URL}aggregate`, {
+      // q: this.getQualifiedSearchString(search),
+      q: search,
+      aggregations
+    }, { headers: this.headers });
   }
 
 }

@@ -33,6 +33,13 @@ describe('CoreServiceService', () => {
     ).toBe('fullText:"drone" AND (fullText:"package" OR fullText:"delivery")');
   });
 
+  // exercise bug fix
+  it('should qualify [corn AND (candy OR band)] as [fullText:"corn" AND (fullText:"candy" OR fullText:"band")]', () => {
+    expect(service.getQualifiedSearchString('corn AND (candy OR band)')).toBe(
+      'fullText:"corn" AND (fullText:"candy" OR fullText:"band")',
+    );
+  });
+
   it('should buildQueryForGet without sort', () => {
     expect(service.buildQueryforGet('drone', { limit: 10, offset: 0 })).toBe(
       'https://api.core.ac.uk/v3/search/works/?limit=10&offset=0&q=(fullText:"drone")',

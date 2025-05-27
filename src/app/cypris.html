@@ -1,6 +1,6 @@
-<!-- <div style="display: flex; flex-direction: column; justify-content: center; align-items: center;"> -->
-    <div class="chart-container" style="max-width: 500px;">
-        <p-chart type="bar" [data]="chartData" [options]="chartOptions" class="w-full md:w-[30rem]" />
+<div>
+    <div>
+        <p-chart type="bar" [data]="chartData" [options]="chartOptions" class="w-6" />
     </div>
     <p-table 
         #dt dataKey="id"
@@ -14,12 +14,19 @@
         >
 
         <ng-template #caption>
-            <p-iconfield>
-                <p-inputicon styleClass="pi pi-search" />
-                <input #search pInputText type="text" (input)="onSearch(search.value)" placeholder="Search..." />
-            </p-iconfield>
-            <p-button label="Clear" [outlined]="true" icon="pi pi-filter-slash" (click)="dt.clear()" />
-            <p-button icon="pi pi-external-link" label="Export" (click)="dt.exportCSV()" />
+            <div>
+                <p-iconfield>
+                    <input #search pInputText type="text" placeholder="Search keywords..." />
+                    <p-button label="Search" (onClick)="onSearch(search.value)"></p-button>
+                    <p-message *ngIf="searchInvalid.getValue()"
+                        severity="error"
+                        text="Parenthesis grouping is invalid"></p-message>
+                </p-iconfield>
+                <div>
+                    <p-button label="Clear" [outlined]="true" icon="pi pi-filter-slash" (click)="dt.clear()" />
+                    <p-button icon="pi pi-external-link" label="Export" (click)="dt.exportCSV()" />
+                </div>
+            </div>
         </ng-template>
 
         <ng-template pTemplate="header" let-columns>
@@ -77,4 +84,4 @@
             </tr>
         </ng-template>
     </p-table>
-<!-- </div> -->
+</div>

@@ -12,6 +12,8 @@ import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { formatDate, NgIf, NgFor } from '@angular/common';
 import { Table } from 'primeng/table';
 import { HttpErrorResponse } from '@angular/common/http';
+import { BehaviorSubject } from 'rxjs';
+
 
 interface ColumnDef {
     field: string;
@@ -55,6 +57,8 @@ export class Cypris {
         { field: 'publisher', header: 'Publisher', sortable: false, type: 'text' },
     ]
 
+    searchInvalid = new BehaviorSubject(false);
+
     chartData: ChartData = {
         labels: [],
         datasets: [
@@ -80,8 +84,6 @@ export class Cypris {
             }
         }
     };
-
-    private timerId: number | undefined;
     
     loading: boolean = false;
     errorMsg: string | null = null;
@@ -93,17 +95,14 @@ export class Cypris {
     ngOnInit(): void {
         this.fetchChartData('');
     }
-    
-    ngOnDestroy() {
-        clearTimeout(this.timerId)
-    }
 
     onSearch(term: string): void {
-        clearTimeout(this.timerId);
-        this.timerId = window.setTimeout(() => {
-            this.dt.filterGlobal(term, 'contains');
-            this.fetchChartData(term);
-        }, 750);
+        const valid = this.isGroupingValid(term);
+        this.searchInvalid.next(!valid);
+        if (!valid) return;
+
+        this.dt.filterGlobal(term, 'contains');
+        this.fetchChartData(term);
     }
 
     getAuthorNames(authors: Result['authors']): string {

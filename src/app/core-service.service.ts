@@ -2,8 +2,9 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { Aggregation, CoreInterface } from './core-interface';
+import { environment as env } from '../environments/environment';
 
-const BASE_URL: string = 'https://api.core.ac.uk/v3/search/works/'
+const BASE_URL: string = env.apiUrl;
 
 interface Sort {
   field: string;
@@ -20,8 +21,7 @@ interface Pagination {
 })
 export class CoreServiceService {
 
-  readonly token = 'Qmp08PTy6ZSBGejJHsNvfKEMUdlkautC';
-  readonly headers = new HttpHeaders().set('Authorization', `Bearer ${this.token}`);
+  readonly headers = new HttpHeaders().set('Authorization', `Bearer ${env.token}`);
 
   constructor(private http: HttpClient) { }
 
@@ -58,7 +58,6 @@ export class CoreServiceService {
 
   postForAggregation(search: string, aggregations: string[]) {
     return this.http.post<Aggregation>(`${BASE_URL}aggregate`, {
-      // q: this.getQualifiedSearchString(search),
       q: search,
       aggregations
     }, { headers: this.headers });

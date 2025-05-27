@@ -27,4 +27,12 @@ describe('CoreServiceService', () => {
     .toBe('fullText:"drone" AND (fullText:"package" OR fullText:"delivery")');
   });
 
+  it('should buildQueryForGet without sort', () => {
+    expect(service.buildQueryforGet('drone', { limit: 10, offset: 0 })).toBe('https://api.core.ac.uk/v3/search/works/?limit=10&offset=0&q=(fullText:"drone")');
+  });
+
+  it ('should buildQueryForGet with sort' , () => {
+    expect(service.buildQueryforGet('drone', { limit: 10, offset:5 }, { field: 'publishedDate', order: 1})).toBe('https://api.core.ac.uk/v3/search/works/?limit=10&offset=5&q=(fullText:"drone")&sort=publishedDate:asc');
+  });
+
 });

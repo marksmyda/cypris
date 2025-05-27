@@ -9,9 +9,8 @@ describe('Cypris', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [Cypris],
-      providers: [provideHttpClient()]
-    })
-    .compileComponents();
+      providers: [provideHttpClient()],
+    }).compileComponents();
 
     fixture = TestBed.createComponent(Cypris);
     component = fixture.componentInstance;
@@ -24,31 +23,48 @@ describe('Cypris', () => {
 
   // Grouping validation
   it('should evaluate grouping [drone AND (package OR delivery)] as valid', () => {
-    expect(component.isGroupingValid('drone AND (package OR delivery)')).toBeTrue();
+    expect(
+      component.isGroupingValid('drone AND (package OR delivery)'),
+    ).toBeTrue();
   });
 
   it('should evaluate grouping [drone AND (package OR delivery) AND (plane OR boat)] as valid', () => {
-    expect(component.isGroupingValid('drone AND (package OR delivery) AND (plane OR boat)')).toBeTrue();
+    expect(
+      component.isGroupingValid(
+        'drone AND (package OR delivery) AND (plane OR boat)',
+      ),
+    ).toBeTrue();
   });
 
   it('should evaluate grouping [drone AND (package OR (delivery AND (plane OR boat)))] as valid', () => {
-    expect(component.isGroupingValid('drone AND (package OR (delivery AND (plane OR boat)))')).toBeTrue();
+    expect(
+      component.isGroupingValid(
+        'drone AND (package OR (delivery AND (plane OR boat)))',
+      ),
+    ).toBeTrue();
   });
 
   it('should evaluate grouping [drone AND (package OR delivery] as invalid', () => {
-    expect(component.isGroupingValid('drone AND (package OR delivery')).toBeFalse();
+    expect(
+      component.isGroupingValid('drone AND (package OR delivery'),
+    ).toBeFalse();
   });
 
   it('should evaluate grouping [drone AND package OR delivery)] as invalid', () => {
-    expect(component.isGroupingValid('drone AND package OR delivery)')).toBeFalse();
+    expect(
+      component.isGroupingValid('drone AND package OR delivery)'),
+    ).toBeFalse();
   });
 
   it('should evaluate grouping [drone AND (package OR (delivery AND plane)] as invalid', () => {
-    expect(component.isGroupingValid('drone AND (package OR (delivery AND plane)')).toBeFalse();
+    expect(
+      component.isGroupingValid('drone AND (package OR (delivery AND plane)'),
+    ).toBeFalse();
   });
 
   it('should evaluate grouping [drone AND (package OR delivery) AND plane)] as invalid', () => {
-    expect(component.isGroupingValid('drone AND (package OR delivery) AND plane)')).toBeFalse();
+    expect(
+      component.isGroupingValid('drone AND (package OR delivery) AND plane)'),
+    ).toBeFalse();
   });
-
 });

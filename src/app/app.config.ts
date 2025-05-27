@@ -13,10 +13,10 @@ export const appConfig: ApplicationConfig = {
       theme: {
         preset: Aura,
         options: { darkModeSelector: '.p-dark' },
-      }
+      },
     }),
     provideHttpClient(),
     provideZoneChangeDetection({ eventCoalescing: true }),
-    provideRouter(routes)
-  ]
+    provideRouter(routes),
+  ],
 };

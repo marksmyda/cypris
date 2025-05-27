@@ -1,87 +1,89 @@
-<div>
-    <div>
-        <p-chart type="bar" [data]="chartData" [options]="chartOptions" class="w-6" />
-    </div>
-    <p-table 
-        #dt dataKey="id"
-        sortField="id" [resizableColumns]="true"
-        [value]="data.results" [expandedRowKeys]="expandedRows"
-        stripedRows [paginator]=true [exportHeader]="'customExportHeader'"
-        scrollable=true [showCurrentPageReport]="true"
-        [rows]="5" [rowsPerPageOptions]="[5, 10, 25, 50]"
-        [lazy]="true" (onLazyLoad)="loadPage($event)" [loading]="loading"
-        [totalRecords]="data.totalHits" [columns]="columns" [exportFunction]="cellExport.bind(this)" exportFilename="papers"
-        >
-
-        <ng-template #caption>
-            <div>
-                <p-iconfield>
-                    <input #search pInputText type="text" placeholder="Search keywords..." />
-                    <p-button label="Search" (onClick)="onSearch(search.value)"></p-button>
-                    <p-message *ngIf="searchInvalid.getValue()"
-                        severity="error"
-                        text="Parenthesis grouping is invalid"></p-message>
-                </p-iconfield>
-                <div>
-                    <p-button label="Clear" [outlined]="true" icon="pi pi-filter-slash" (click)="dt.clear()" />
-                    <p-button icon="pi pi-external-link" label="Export" (click)="dt.exportCSV()" />
-                </div>
-            </div>
-        </ng-template>
-
-        <ng-template pTemplate="header" let-columns>
-            <tr>
-                <th style="width: 5rem"></th>
-                <th pResizableColumn
-                    *ngFor="let col of columns"
-                    [pSortableColumn]="col.sortable ? col.field : undefined">
-
-                    {{ col.header }}
-
-                    <ng-container *ngIf="col.sortable">
-                        <p-sortIcon [field]="col.field"></p-sortIcon>
-                    </ng-container>
-                </th>
-            </tr>
-        </ng-template>
-        <ng-template pTemplate="body" let-result let-expanded="expanded">
-            <tr>
-                <td>
-                    <p-button type="button" pRipple [pRowToggler]="result" [text]="true" [rounded]="true" [plain]="true" [icon]="expanded ? 'pi pi-chevron-down' : 'pi pi-chevron-right'" />
-                </td>
-                <td *ngFor="let col of columns" style="max-width:250px; word-break: break-word; white-space: normal;">
-                    {{ formatCell(result[col.field], col) }}
-                </td>
-            </tr>
-        </ng-template>
-        <ng-template #expandedrow let-result>
-            <tr>
-                <td [attr.colspan]="columns.length + 1">
-                    <div>
-                        <h4>Abstract</h4>
-                        <ng-container *ngIf="result.abstract; else noAbstract">
-                            <p style="word-break: break-word; white-space: normal;">{{ result.abstract }}</p>
-                        </ng-container>
-
-                        <ng-template #noAbstract>
-                            <p>Not Available</p>
-                        </ng-template>
+<div class="chart-table-layout">
+    <p-chart type="bar" [data]="chartData" [options]="chartOptions" height="100%"/>
+    <div class="data-table">
+        <p-table 
+            #dt dataKey="id"
+            sortField="id" [resizableColumns]="true"
+            [value]="data.results" [expandedRowKeys]="expandedRows"
+            stripedRows [paginator]=true [exportHeader]="'customExportHeader'"
+            scrollable=true [showCurrentPageReport]="true" pageLinks="10"
+            [rows]="10" [rowsPerPageOptions]="[5, 10, 25, 50]" scrollHeight="flex"
+            [lazy]="true" (onLazyLoad)="loadPage($event)" [loading]="loading"
+            [totalRecords]="data.totalHits" [columns]="columns" [exportFunction]="cellExport.bind(this)" exportFilename="papers"
+            >
+    
+            <ng-template #caption>
+                <div class="caption-bar">
+                    <p-iconfield>
+                        <div class="actions">
+                            <input class="search-bar" #search pInputText type="text" placeholder="Search keywords..." (keydown.enter)="onSearch(search.value)"  />
+                            <p-button label="Search" (onClick)="onSearch(search.value)"></p-button>
+                        </div>
+                        <p-message *ngIf="searchInvalid.getValue()"
+                            severity="error"
+                            text="Parenthesis grouping is invalid"></p-message>
+                    </p-iconfield>
+                    <div class="actions">
+                        <p-button label="Clear" [outlined]="true" icon="pi pi-filter-slash" (click)="dt.clear()" />
+                        <p-button icon="pi pi-external-link" label="Export" (click)="dt.exportCSV()" />
                     </div>
-                </td>
-            </tr>
-        </ng-template>
-        <ng-template pTemplate="emptymessage">
-            <tr>
-                <td [attr.colspan]="columns.length" class="text-center">
-                    <ng-container *ngIf="errorMsg; else noRows">
-                        <p-message severity="error" [text]="errorMsg"></p-message>
-                    </ng-container>
-
-                    <ng-template #noRows>
-                        <span>No records found.</span>
-                    </ng-template>
-                </td>
-            </tr>
-        </ng-template>
-    </p-table>
+                </div>
+            </ng-template>
+    
+            <ng-template pTemplate="header" let-columns>
+                <tr>
+                    <th></th>
+                    <th pResizableColumn
+                        *ngFor="let col of columns"
+                        [pSortableColumn]="col.sortable ? col.field : undefined">
+    
+                        {{ col.header }}
+    
+                        <ng-container *ngIf="col.sortable">
+                            <p-sortIcon [field]="col.field"></p-sortIcon>
+                        </ng-container>
+                    </th>
+                </tr>
+            </ng-template>
+            <ng-template pTemplate="body" let-result let-expanded="expanded">
+                <tr>
+                    <td>
+                        <p-button type="button" pRipple [pRowToggler]="result" [text]="true" [rounded]="true" [plain]="true" [icon]="expanded ? 'pi pi-chevron-down' : 'pi pi-chevron-right'" />
+                    </td>
+                    <td *ngFor="let col of columns" class="cell">
+                        {{ formatCell(result[col.field], col) }}
+                    </td>
+                </tr>
+            </ng-template>
+            <ng-template #expandedrow let-result>
+                <tr>
+                    <td [attr.colspan]="columns.length + 1">
+                        <div>
+                            <h4>Abstract</h4>
+                            <ng-container *ngIf="result.abstract; else noAbstract">
+                                <p class="abstract">{{ result.abstract }}</p>
+                            </ng-container>
+    
+                            <ng-template #noAbstract>
+                                <p>Not Available</p>
+                            </ng-template>
+                        </div>
+                    </td>
+                </tr>
+            </ng-template>
+            <ng-template pTemplate="emptymessage">
+                <tr>
+                    <td [attr.colspan]="columns.length + 1" class="text-center">
+                        <ng-container *ngIf="errorMsg; else noRows">
+                            <p-message severity="error" [text]="errorMsg"></p-message>
+                        </ng-container>
+    
+                        <ng-template #noRows>
+                            <span>No records found.</span>
+                        </ng-template>
+                    </td>
+                </tr>
+            </ng-template>
+        </p-table>
+    </div>
 </div>

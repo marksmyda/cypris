@@ -4,6 +4,12 @@ This project was generated using [Angular CLI](https://github.com/angular/angula
 
 ## Development server
 
+This project uses yarn. Run the following once:
+
+```bash
+yarn install
+```
+
 To start a local development server, run:
 
 ```bash

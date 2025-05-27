@@ -9,9 +9,16 @@ import { CoreInterface, Result } from './core-interface';
 import { ReactiveFormsModule } from '@angular/forms';
 import { ChartModule } from 'primeng/chart';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
-import { formatDate, NgIf } from '@angular/common';
+import { formatDate, NgIf, NgFor } from '@angular/common';
 import { Table } from 'primeng/table';
 import { HttpErrorResponse } from '@angular/common/http';
+
+interface ColumnDef {
+    field: string;
+    header: string;
+    sortable: boolean;
+    type: 'text' | 'date' | 'author' | 'number'
+}
 
 const NO_DATA = {
     totalHits: 0,
@@ -25,12 +32,21 @@ const NO_DATA = {
     selector: 'button-demo',
     templateUrl: 'button-demo.html',
     standalone: true,
-    imports: [ButtonModule, TableModule, ReactiveFormsModule, ChartModule, ProgressSpinnerModule, IconFieldModule, InputIconModule, NgIf, MessageModule]
+    imports: [ButtonModule, TableModule, ReactiveFormsModule, ChartModule, ProgressSpinnerModule, IconFieldModule, InputIconModule, NgIf, MessageModule, NgFor]
 })
 export class ButtonDemo {
     @ViewChild('dt') dt!: Table;
 
     data: CoreInterface = NO_DATA;
+    columns: ColumnDef[] = [
+        { field: 'id', header: 'ID', sortable: true, type: 'number' },
+        { field: 'doi', header: 'DOI', sortable: false, type: 'text' },
+        { field: 'title', header: 'Title', sortable: false, type: 'text' },
+        { field: 'publishedDate', header: 'Published Date', sortable: true, type: 'date' },
+        { field: 'acceptedDate', header: 'Accepted Date', sortable: true, type: 'date' },
+        { field: 'authors', header: 'Authors', sortable: false, type: 'author' },
+        { field: 'publisher', header: 'Publisher', sortable: false, type: 'text' },
+    ]
 
     fieldData = {
         labels: ["A", "B", "C"],
@@ -62,16 +78,32 @@ export class ButtonDemo {
         }, 450);
     }
 
-    getAuthorNames(result: Result): string {
-        return result.authors.map(author => author.name).join(', ');
+    getAuthorNames(authors: Result['authors']): string {
+        return authors.map(author => author.name).join(', ');
     }
 
-    getDateFromString(result: Result): string {
-        return formatDate(new Date(result.publishedDate), 'yyyy MMM dd', 'en');
+    getDateFromString(value: string): string {
+        try {
+            return formatDate(new Date(value), 'yyyy MMM dd', 'en');
+        } catch {
+            return 'Invalid Date';
+        }
+    }
+
+    cellExport(cell: { data: unknown, field: string }) {
+        const columnDef = this.columns.find(col => col.field === cell.field)!;
+        return this.formatCell(cell.data, columnDef)
+    }
+
+    formatCell(value: unknown, col: ColumnDef): string {
+        switch (col.type) {
+            case 'author':   return this.getAuthorNames(value as Result['authors'])
+            case 'date':     return this.getDateFromString(value as string)
+            default:         return String(value ?? '');
+        }
     }
 
     private handleError(err: HttpErrorResponse) {
-        console.log(err);
         if (err.status === 429) {
             this.errorMsg = 'Too many requests - please pause a moment and try again.';
         } else if (err.status === 500) {

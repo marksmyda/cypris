@@ -17,8 +17,16 @@ describe('Cypris', () => {
     fixture.detectChanges();
   });
 
-  it('should create', () => {
-    expect(component).toBeTruthy();
+  it('should create the app', () => {
+    const fixture = TestBed.createComponent(Cypris);
+    const app = fixture.componentInstance;
+    expect(app).toBeTruthy();
+  });
+
+  it(`should have the 'cypris' title`, () => {
+    const fixture = TestBed.createComponent(Cypris);
+    const app = fixture.componentInstance;
+    expect(app.title).toEqual('cypris');
   });
 
   // Grouping validation

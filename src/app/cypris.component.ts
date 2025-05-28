@@ -13,6 +13,7 @@ import { formatDate, NgIf, NgFor } from '@angular/common';
 import { Table } from 'primeng/table';
 import { HttpErrorResponse } from '@angular/common/http';
 import { BehaviorSubject } from 'rxjs';
+import { RouterOutlet } from '@angular/router';
 
 interface ColumnDef {
   field: string;
@@ -51,9 +52,12 @@ const INITIAL_TABLE_DATA = {
     NgIf,
     MessageModule,
     NgFor,
+    RouterOutlet,
   ],
 })
 export class Cypris {
+  title = 'cypris';
+
   @ViewChild('dt') dt!: Table;
 
   data: CoreInterface = INITIAL_TABLE_DATA;

@@ -1,7 +1,7 @@
 import { bootstrapApplication } from '@angular/platform-browser';
 import { appConfig } from './app/app.config';
-import { AppComponent } from './app/app.component';
+import { Cypris } from './app/cypris.component';
 
-bootstrapApplication(AppComponent, appConfig).catch((err) =>
+bootstrapApplication(Cypris, appConfig).catch((err) =>
   console.error(err),
 );
